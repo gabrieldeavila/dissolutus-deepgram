@@ -2,7 +2,8 @@
   "imports": {
     "@std/http": "jsr:@std/http@^1.0.5",
     "serve": "https://deno.land/std@0.150.0/http/server.ts",
-    "socket.io": "https://deno.land/x/socket_io@0.2.0/mod.ts",
-    "wrtc": "https://esm.sh/wrtc@0.4.7"
+
+    "@deepgram/sdk": "https://esm.sh/@deepgram/sdk@3.6.0",
+    "axiod": "https://deno.land/x/axiod/mod.ts"
   }
 }
