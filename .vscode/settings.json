@@ -1,7 +1,0 @@
-{
-  "typescript.enablePromptUseWorkspaceTsdk": true,
-  "deno.enable": true,
-  "deno.lint": true,
-  "deno.unstable": false,
-  "deno.importMap": "./deno.json",
-}
