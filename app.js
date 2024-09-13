@@ -4,11 +4,11 @@ import { createClient, LiveTranscriptionEvents } from "@deepgram/sdk";
 import { io } from "socket.io-client";
 import Peer from "simple-peer";
 import wrtc from "@koush/wrtc";
-import fetch from "cross-fetch";
+import fetcha from "cross-fetch";
 
 const socket = io(
   process.env.NEXT_PUBLIC_SOCKET_URL ??
-    "https://dissolutus-socket-production.up.railway.app",
+    "http://localhost:3001",
   {
     autoConnect: false,
   }
@@ -19,7 +19,7 @@ const url = "http://stream.live.vc.bbcmedia.co.uk/bbc_world_service";
 
 const live = async () => {
   // STEP 1: Create a Deepgram client using the API key
-  const deepgram = createClient("");
+  const deepgram = createClient("d02172823d14c1ba0b4b70bba28b9bfba109c3d3");
 
   // STEP 2: Create a live transcription connection
   const connection = deepgram.listen.live({
@@ -48,38 +48,26 @@ const live = async () => {
 
     socket.connect();
     socket.on("me", (id) => {
-      const peer = new Peer({ initiator: true, wrtc });
-      console.log(peer);
-
-      peer.on("signal", (data) => {
-        console.log("CHAmAnDO O CARA", id, data);
-        socket.emit("callUser", {
-          userToCall: "3ld4py-OCPMzUzohbKzq",
-          signalData: data,
-          from: id,
-        });
+      console.log("AAAA");
+      socket.emit("callUser", {
+        userToCall: "o5g93bN5vKLJquWKwQL9",
+        from: id,
       });
-      peer.on("stream", (currentStream) => {
-        // mediaStream -> currentStream
-        const chunks = [];
 
-        console.log(chunks, currentStream.getTracks());
-        console.dir(currentStream);
-      });
-      socket.on("callAccepted", (signal) => {
-        peer.signal(signal);
+      socket.on("receiveChunk", (data) => {
+        console.log(data);
+        connection.send(data);
       });
     });
 
     // STEP 4: Fetch the audio stream and send it to the live transcription connection
-    fetch(url)
-      .then((r) => r.body)
-      .then((res) => {
-        res.on("readable", () => {
-          console.log("Sending audio data...", res.read(), res);
-          connection.send(res.read());
-        });
-      });
+    // fetcha(url)
+    //   .then((r) => r.body)
+    //   .then((res) => {
+    //     res.on("readable", () => {
+    //       connection.send(res.read());
+    //     });
+    //   });
   });
 };
 
