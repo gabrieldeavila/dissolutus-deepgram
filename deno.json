@@ -1,11 +1,17 @@
 {
   "imports": {
-    "@deepgram/sdk": "https://esm.sh/@deepgram/sdk@3.6.0",
-    "@oak/oak": "jsr:@oak/oak@^16.0.0",
     "oak_decorators": "https://deno.land/x/oak_decorators@v0.2.1/mod.ts",
-    "@std/http": "jsr:@std/http@^1.0.5",
     "axiod": "https://deno.land/x/axiod/mod.ts",
-    "serve": "https://deno.land/std@0.150.0/http/server.ts"
+    "serve": "https://deno.land/std@0.150.0/http/server.ts",
+    "oakCors": "https://deno.land/x/cors@v1.2.2/mod.ts",
+
+    "@deepgram/sdk": "https://esm.sh/@deepgram/sdk@3.6.0",
+    "socket.io-client": "https://esm.sh/socket.io-client@4.7.5",
+    "@supabase/supabase-js": "https://esm.sh/@supabase/supabase-js@2.45.4",
+
+    "@oak/oak": "jsr:@oak/oak@^16.0.0",
+    "@std/http": "jsr:@std/http@^1.0.5",
+    "dotenv": "jsr:@std/dotenv/load"
   },
   "compilerOptions": {
     "strictPropertyInitialization": false,

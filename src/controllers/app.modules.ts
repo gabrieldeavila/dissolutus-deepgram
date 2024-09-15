@@ -4,6 +4,5 @@ import { DeepgramController } from "./deepgram/deepgram-controller.ts";
 @Module({
   controllers: [DeepgramController],
   routePrefix: "api/v1",
-  modules: []
 })
 export class AppModule {}
