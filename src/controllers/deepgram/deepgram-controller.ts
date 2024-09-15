@@ -14,6 +14,7 @@ export class DeepgramController {
   live(
     @Request() request: Request,
     @Query("id") id: string,
+    @Query("language") language: string,
     @Response() response: Response
   ) {
     const authorization = request.headers.get("authorization")!;
@@ -48,14 +49,26 @@ export class DeepgramController {
     const connection = deepgram.listen.live({
       punctuate: true,
       model: "nova-2",
-      language: "pt-BR",
+      language: language ?? "pt-BR",
     });
 
     connection.on(LiveTranscriptionEvents.Open, () => {
       // Listen for any transcripts received from Deepgram and write them to the console.
-      connection.on(LiveTranscriptionEvents.Transcript, (data) => {
-        console.dir(data, "Transcript");
-      });
+      connection.on(
+        LiveTranscriptionEvents.Transcript,
+        (data: {
+          type: string;
+          channel: {
+            alternatives: {
+              transcript: string;
+            }[];
+          };
+        }) => {
+          data.channel.alternatives.map((alternative) => {
+            console.log(alternative.transcript);
+          });
+        }
+      );
 
       // Listen for any metadata received from Deepgram and write it to the console.
       connection.on(LiveTranscriptionEvents.Metadata, (data) => {
@@ -75,6 +88,11 @@ export class DeepgramController {
 
         socket.on("receiveChunk", (data) => {
           connection.send(data);
+        });
+
+        socket.on("closeConnection", () => {
+          connection.requestClose();
+          console.log("Connection closed!");
         });
       });
 
