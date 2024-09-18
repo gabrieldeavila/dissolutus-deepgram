@@ -14,6 +14,8 @@ export class DeepgramController {
   live(
     @Request() request: Request,
     @Query("id") id: string,
+    @Query("sentiaId") sentiaId: string,
+    @Query("sentiaTypeId") sentiaTypeId: string,
     @Query("language") language: string,
     @Response() response: Response
   ) {
@@ -39,6 +41,7 @@ export class DeepgramController {
         },
       }
     );
+
     const socket = io(Deno.env.get("SOCKET_URL")!, {
       autoConnect: false,
     });
@@ -66,6 +69,27 @@ export class DeepgramController {
         }) => {
           data.channel.alternatives.map((alternative) => {
             console.log(alternative.transcript);
+            if (alternative.transcript.length === 0) return;
+
+            supabase
+              .from("sentia_stream")
+              .insert([
+                {
+                  sentia_id: sentiaId,
+                  sentia_type_id: sentiaTypeId,
+                  text: alternative.transcript,
+                },
+              ])
+              .then(({ error }) => {
+                // close connection if error
+                if (error) {
+                  console.error(error);
+                  connection.requestClose();
+                  return;
+                }
+
+                console.log("Transcript saved!");
+              });
           });
         }
       );
