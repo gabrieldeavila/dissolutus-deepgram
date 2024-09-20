@@ -67,29 +67,28 @@ export class DeepgramController {
             }[];
           };
         }) => {
-          data.channel.alternatives.map((alternative) => {
+          data.channel.alternatives.map(async (alternative) => {
             console.log(alternative.transcript);
             if (alternative.transcript.length === 0) return;
 
-            supabase
-              .from("sentia_stream")
-              .insert([
-                {
-                  sentia_id: sentiaId,
-                  sentia_type_id: sentiaTypeId,
-                  text: alternative.transcript,
-                },
-              ])
-              .then(({ error }) => {
-                // close connection if error
-                if (error) {
-                  console.error(error);
-                  connection.requestClose();
-                  return;
-                }
+            const { data } = await supabase
+              .from("sentia_type")
+              .select("text")
+              .eq("id", sentiaTypeId)
+              .single();
 
-                console.log("Transcript saved!");
-              });
+            if (!data) {
+              console.error("Sentia type not found!");
+              connection.requestClose();
+              return;
+            }
+
+            const newText = data.text + "\n " + alternative.transcript;
+
+            await supabase
+              .from("sentia_type")
+              .update({ text: newText })
+              .eq("id", sentiaTypeId);
           });
         }
       );
