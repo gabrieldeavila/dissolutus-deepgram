@@ -14,7 +14,7 @@ export class DeepgramController {
   live(
     @Request() request: Request,
     @Query("id") id: string,
-    @Query("sentiaId") sentiaId: string,
+    // @Query("sentiaId") sentiaId: string,
     @Query("sentiaTypeId") sentiaTypeId: string,
     @Query("language") language: string,
     @Response() response: Response
@@ -55,11 +55,13 @@ export class DeepgramController {
       language: language ?? "pt-BR",
     });
 
+    let isSendingData: null | Promise<boolean> = null;
+
     connection.on(LiveTranscriptionEvents.Open, () => {
       // Listen for any transcripts received from Deepgram and write them to the console.
       connection.on(
         LiveTranscriptionEvents.Transcript,
-        (data: {
+        async (data: {
           type: string;
           channel: {
             alternatives: {
@@ -67,28 +69,43 @@ export class DeepgramController {
             }[];
           };
         }) => {
-          data.channel.alternatives.map(async (alternative) => {
-            console.log(alternative.transcript);
-            if (alternative.transcript.length === 0) return;
+          await isSendingData;
+          isSendingData = new Promise((resolve, reject) => {
+            let someDataChanged = false;
 
-            const { data } = await supabase
-              .from("sentia_type")
-              .select("text")
-              .eq("id", sentiaTypeId)
-              .single();
+            (async () => {
+              const { data: sentiaData } = await supabase
+                .from("sentia_type")
+                .select("text")
+                .eq("id", sentiaTypeId)
+                .single();
 
-            if (!data) {
-              console.error("Sentia type not found!");
-              connection.requestClose();
-              return;
-            }
+              if (!sentiaData) {
+                console.error("Sentia type not found!");
+                connection.requestClose();
+                reject();
+                return;
+              }
 
-            const newText = data.text + "\n " + alternative.transcript;
+              data.channel.alternatives.map((alternative) => {
+                if (alternative.transcript.length === 0) return;
+                someDataChanged = true;
 
-            await supabase
-              .from("sentia_type")
-              .update({ text: newText })
-              .eq("id", sentiaTypeId);
+                sentiaData.text = sentiaData.text
+                  ? sentiaData.text + "\n" + alternative.transcript
+                  : alternative.transcript;
+              });
+
+              if (someDataChanged) {
+                await supabase
+                  .from("sentia_type")
+                  .update({ text: sentiaData.text })
+                  .eq("id", sentiaTypeId)
+                  .select("*");
+              }
+
+              resolve(true);
+            })();
           });
         }
       );
