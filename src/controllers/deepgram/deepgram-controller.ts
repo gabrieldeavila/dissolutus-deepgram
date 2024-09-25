@@ -52,6 +52,7 @@ export class DeepgramController {
     const connection = deepgram.listen.live({
       punctuate: true,
       model: "nova-2",
+      diarize: true,
       language: language ?? "pt-BR",
     });
 
@@ -74,11 +75,12 @@ export class DeepgramController {
             let someDataChanged = false;
 
             (async () => {
-              const { data: sentiaData } = await supabase
+              const { data: sentiaData, error } = await supabase
                 .from("sentia_type")
                 .select("text")
                 .eq("id", sentiaTypeId)
                 .single();
+              console.log(error);
 
               if (!sentiaData) {
                 console.error("Sentia type not found!");
@@ -127,6 +129,7 @@ export class DeepgramController {
         });
 
         socket.on("receiveChunk", (data) => {
+          console.log("received this chunk: ", data);
           connection.send(data);
         });
 
