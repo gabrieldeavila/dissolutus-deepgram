@@ -1,18 +1,17 @@
 {
   "imports": {
+    "oak_decorators": "https://deno.land/x/oak_decorators@v0.2.1/mod.ts",
+    "axiod": "https://deno.land/x/axiod/mod.ts",
+    "serve": "https://deno.land/std@0.150.0/http/server.ts",
+    "oakCors": "https://deno.land/x/cors@v1.2.2/mod.ts",
+
     "@deepgram/sdk": "https://esm.sh/@deepgram/sdk@3.6.0",
-    "@j3lte/ytdl-wrapper": "jsr:@j3lte/ytdl-wrapper@^0.2.0",
+    "socket.io-client": "https://esm.sh/socket.io-client@4.7.5",
+    "@supabase/supabase-js": "https://esm.sh/@supabase/supabase-js@2.45.4",
+
     "@oak/oak": "jsr:@oak/oak@^16.0.0",
     "@std/http": "jsr:@std/http@^1.0.5",
-    "@supabase/supabase-js": "https://esm.sh/@supabase/supabase-js@2.45.4",
-    "axiod": "https://deno.land/x/axiod/mod.ts",
-    "dotenv": "jsr:@std/dotenv/load",
-    "oakCors": "https://deno.land/x/cors@v1.2.2/mod.ts",
-    "oak_decorators": "https://deno.land/x/oak_decorators@v0.2.1/mod.ts",
-    "serve": "https://deno.land/std@0.150.0/http/server.ts",
-    "socket.io-client": "https://esm.sh/socket.io-client@4.7.5",
-    "ytdl": "https://esm.sh/@distube/ytdl-core@4.14.4",
-    "youtube-mp3-downloader": "https://esm.sh/youtube-mp3-downloader@0.7.11"
+    "dotenv": "jsr:@std/dotenv/load"
   },
   "compilerOptions": {
     "strictPropertyInitialization": false,
