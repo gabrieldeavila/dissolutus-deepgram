@@ -14,8 +14,7 @@ export class DeepgramController {
   live(
     @Request() request: Request,
     @Query("id") id: string,
-    // @Query("sentiaId") sentiaId: string,
-    @Query("sentiaTypeId") sentiaTypeId: string,
+    @Query("sentiaId") sentiaId: string,
     @Query("language") language: string,
     @Response() response: Response
   ) {
@@ -75,12 +74,11 @@ export class DeepgramController {
             let someDataChanged = false;
 
             (async () => {
-              const { data: sentiaData, error } = await supabase
-                .from("sentia_type")
+              const { data: sentiaData } = await supabase
+                .from("sentia")
                 .select("text")
-                .eq("id", sentiaTypeId)
+                .eq("id", sentiaId)
                 .single();
-              console.log(error);
 
               if (!sentiaData) {
                 console.error("Sentia type not found!");
@@ -100,9 +98,9 @@ export class DeepgramController {
 
               if (someDataChanged) {
                 await supabase
-                  .from("sentia_type")
+                  .from("sentia")
                   .update({ text: sentiaData.text })
-                  .eq("id", sentiaTypeId)
+                  .eq("id", sentiaId)
                   .select("*");
               }
 
@@ -129,7 +127,6 @@ export class DeepgramController {
         });
 
         socket.on("receiveChunk", (data) => {
-          console.log("received this chunk: ", data);
           connection.send(data);
         });
 
