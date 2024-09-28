@@ -70,38 +70,27 @@ export class DeepgramController {
           };
         }) => {
           await isSendingData;
-          isSendingData = new Promise((resolve, reject) => {
+          isSendingData = new Promise((resolve) => {
             let someDataChanged = false;
 
             (async () => {
-              const { data: sentiaData } = await supabase
-                .from("sentia")
-                .select("text")
-                .eq("id", sentiaId)
-                .single();
-
-              if (!sentiaData) {
-                console.error("Sentia type not found!");
-                connection.requestClose();
-                reject();
-                return;
-              }
-
+              let newText = "";
               data.channel.alternatives.map((alternative) => {
                 if (alternative.transcript.length === 0) return;
                 someDataChanged = true;
 
-                sentiaData.text = sentiaData.text
-                  ? sentiaData.text + "\n" + alternative.transcript
+                newText = newText
+                  ? newText + "\n" + alternative.transcript
                   : alternative.transcript;
               });
 
               if (someDataChanged) {
-                await supabase
-                  .from("sentia")
-                  .update({ text: sentiaData.text })
-                  .eq("id", sentiaId)
-                  .select("*");
+                await supabase.from("sentia_stream").insert([
+                  {
+                    sentia_id: sentiaId,
+                    text: newText,
+                  },
+                ]);
               }
 
               resolve(true);
@@ -127,6 +116,7 @@ export class DeepgramController {
         });
 
         socket.on("receiveChunk", (data) => {
+          console.log(data);
           connection.send(data);
         });
 
